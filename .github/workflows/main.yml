@@ -20,8 +20,10 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Get the latest data
-        run: mkdir -p result
-           | curl -L -X 'https://script.google.com/macros/s/AKfycbzpf25Ji-4wUKc7wvV1yjvhowR-vkrpzukrUc7fQdprBLovAetNr83ju7Am4vuaNiRo/exec?action=all' > result/index.json
+        run: |
+           mkdir -p ./result
+           touch ./result/index.json
+           curl -L -X 'https://script.google.com/macros/s/AKfycbzpf25Ji-4wUKc7wvV1yjvhowR-vkrpzukrUc7fQdprBLovAetNr83ju7Am4vuaNiRo/exec?action=all' > ./result/index.json
 
       - name: Push artifact to gh-pages
         if: success()
