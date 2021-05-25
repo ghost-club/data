@@ -23,7 +23,7 @@ jobs:
         run: |
            mkdir -p ./result
            touch ./result/index.json
-           curl -L -X GET 'https://script.google.com/macros/s/AKfycby0xdKkzfXovdxmGOUOBGwptupdxReW5JoY4RyuckoB4KFgm8nY4w23hIuBZBc49nuX/exec?action=all' > ./result/index.json
+           curl -L -X GET 'https://script.google.com/macros/s/AKfycbwrDq3tGzCFF0YNwGTtvLOOVcNr43khyrWMpVYO9W2JkizLRJwns-B10WAzjUuXNkRX/exec?action=all' > ./result/index.json
 
       - name: Push artifact to gh-pages
         if: success()
