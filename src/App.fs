@@ -44,6 +44,8 @@ type IMediaInfo = {|
   thumbnailUrl: string
   origUrl: string
   srcSet: string
+  thumbnailUrlWebP: string
+  origUrlWebP: string
   srcSetWebP: string
 |}
 
@@ -122,7 +124,9 @@ let mapMediaInfo (pic: IMediaInfo) : IMediaInfo =
       srcSet = createSrcSet "jpg"
       srcSetWebP = createSrcSet "webp"
       origUrl = getUrl "orig" "jpg"
+      origUrlWebP = getUrl "orig" "webp"
       thumbnailUrl = getUrl "thumb" "jpg"
+      thumbnailUrlWebP = getUrl "thumb" "webp"
   |}
 
 let checkUpdated (input: IResult<All>) (oldOutput: IResult<All>) =
