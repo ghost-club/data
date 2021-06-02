@@ -69,7 +69,7 @@ Target.create "Watch" (fun _ ->
 )
 
 Target.create "Bundle" (fun _ ->
-   npx <| sprintf "rollup --file %s/app.js --format umd --name app %s/App.js" destDir buildDir
+   npx "rollup -c"
 )
 
 // Build order

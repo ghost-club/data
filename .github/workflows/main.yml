@@ -42,6 +42,9 @@ jobs:
       - name: Run FAKE
         run: dotnet fake build target Bundle
 
+      - name: Copy package.json
+        run: cp package.json output/package.json
+
       - name: Push artifact to main
         if: success()
         uses: crazy-max/ghaction-github-pages@v2.4.1

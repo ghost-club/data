@@ -90,9 +90,9 @@ open Sharp
 let processImageTask (pic: IMediaInfo) =
   let write (orig: Node.Buffer.Buffer) suffix (config: Sharp.Sharp -> Sharp.Sharp) =
     promise {
-      let s1 = sharp.Create(orig) |> config
+      let s1 = Sharp.Create(orig) |> config
       do! s1.jpeg(!!{| progressive = true |}).toFile("./result/gallery/" + createFileNameOfMedia pic suffix "jpg") |> Promise.map ignore
-      let s2 = sharp.Create(orig) |> config
+      let s2 = Sharp.Create(orig) |> config
       do! s2.webp(!!{| quality = 85; reductionEffort = 6 |}).toFile("./result/gallery/" + createFileNameOfMedia pic suffix "webp") |> Promise.map ignore
     }
 
