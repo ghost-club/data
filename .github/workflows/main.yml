@@ -32,6 +32,9 @@ jobs:
         with:
           ref: bin
           path: bin
+          
+      - name: Install dependency of the script
+        run: cd bin && npm install
 
       - name: Execute the script
         run: node bin/app.js
