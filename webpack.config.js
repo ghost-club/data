@@ -45,13 +45,6 @@ module.exports = {
   resolve: {
     modules: [nodeModulesDir]
   },
-  plugins: [
-    new CopyWebpackPlugin({
-      patterns: [
-        { from: './static' }
-      ]
-    })
-  ],
   module: {
     rules: [
       {
