@@ -1,0 +1,28 @@
+{
+  "private": true,
+  "name": "app",
+  "files": [
+    "output/"
+  ],
+  "main": "./output/app.js",
+  "bin": {
+    "app": "./output/app.js"
+  },
+  "scripts": {
+    "start": "dotnet fable watch src --run webpack-dev-server"
+  },
+  "devDependencies": {
+    "@types/sharp": "^0.28.3",
+    "copy-webpack-plugin": "^8.0.0",
+    "node-loader": "^2.0.0",
+    "webpack": "^5.24.4",
+    "webpack-cli": "^4.5.0",
+    "webpack-dev-server": "^3.11.2"
+  },
+  "dependencies": {
+    "@types/mime-types": "^2.1.0",
+    "mime-types": "^2.1.31",
+    "node-fetch": "^2.6.1",
+    "sharp": "^0.28.3"
+  }
+}
