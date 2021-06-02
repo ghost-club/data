@@ -139,7 +139,7 @@ let checkUpdated (input: IResult<All>) (oldOutput: IResult<All>) =
       let s2 = output.images |> Seq.map (fun m -> m.id) |> Set.ofSeq
       if s1 <> s2 then true
       else
-        output.images |> Array.exists (fun m -> isNullOrUndefined m.srcSet)
+        output.images |> Array.exists (fun m -> isNullOrUndefined m.srcSet || isNullOrUndefined m.thumbnailUrlWebP)
 
 let mainTask =
   promise {
@@ -149,13 +149,19 @@ let mainTask =
       Fetch.fetch (GoogleAppUrl + "?action=all-force") []
     let! oldOutput =
       Fetch.fetch (BaseUrl + "index.json") []
-    if not input.Ok || not oldOutput.Ok then
+    if not input.Ok then
       printfn "failed to fetch data"
       return -1
     else
       let! input = input.json<IResult<All>>()
-      let! oldOutput = oldOutput.json<IResult<All>>()
-      if not (checkUpdated input oldOutput) then
+      let! shouldUpdate =
+        promise {
+          if not oldOutput.Ok then return true
+          else
+            let! oldOutput = oldOutput.json<IResult<All>>()
+            return checkUpdated input oldOutput
+        }
+      if not shouldUpdate then
         printfn "does not need to be updated"
         return -1
       else
