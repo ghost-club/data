@@ -12,7 +12,7 @@ type ArrayLike<'t> =
 type Record<'key, 'value> =
     abstract Item: 'key -> 'value with get
 
-let [<Import("*","sharp")>] sharp: IExports = jsNative
+let [<ImportDefault("sharp")>] sharp: IExports = jsNative
 
 type [<AllowNullLiteral>] IExports =
     /// <summary>Creates a sharp instance from an image</summary>

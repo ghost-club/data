@@ -40,7 +40,7 @@ jobs:
            | dotnet tool restore
 
       - name: Run FAKE
-        run: dotnet fake build
+        run: dotnet fake build target Bundle
 
       - name: Push artifact to main
         if: success()

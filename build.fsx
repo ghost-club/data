@@ -20,6 +20,24 @@ open Fake.IO
 open Fake.IO.Globbing.Operators
 open Fake.JavaScript
 
+let buildDir = "bin"
+let destDir = "output"
+
+let run cmd dir args =
+    let result =
+        CreateProcess.fromRawCommandLine cmd args
+        |> CreateProcess.withWorkingDirectory dir
+        |> Proc.run
+    if result.ExitCode <> 0 then
+        failwithf "Error while running '%s' with args: %s " cmd args
+
+let platformTool tool =
+    ProcessUtils.tryFindFileOnPath tool
+    |> function Some t -> t | _ -> failwithf "%s not found" tool
+
+let npxTool = platformTool "npx"
+let npx args = run npxTool "./" args
+
 Target.create "Clean" (fun _ ->
     !! "src/bin"
     ++ "src/obj"
@@ -43,11 +61,15 @@ Target.create "JSInstall" (fun _ ->
 )
 
 Target.create "Build" (fun _ ->
-    DotNet.exec id "fable" "src --run webpack" |> ignore
+    DotNet.exec id "fable" (sprintf "src --outDir %s" buildDir) |> ignore
 )
 
 Target.create "Watch" (fun _ ->
-    DotNet.exec id "fable" "watch src -s --run webpack -w" |> ignore
+    DotNet.exec id "fable" (sprintf "watch src --outDir %s --define DEBUG" buildDir) |> ignore
+)
+
+Target.create "Bundle" (fun _ ->
+   npx <| sprintf "rollup --file %s/app.js --format umd --name app %s/App.js" destDir buildDir
 )
 
 // Build order
@@ -55,6 +77,9 @@ Target.create "Watch" (fun _ ->
     ==> "Install"
     ==> "JSInstall"
     ==> "Build"
+
+"Build"
+    ==> "Bundle"
 
 "Watch"
     <== [ "JSInstall" ]
