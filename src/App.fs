@@ -163,7 +163,8 @@ let mainTask =
         }
       if not shouldUpdate then
         printfn "does not need to be updated"
-        return -1
+        ``process``.env?NO_UPDATE <- "true"
+        return 0
       else
         match input with
         | IResult.Error msg ->
