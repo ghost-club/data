@@ -34,10 +34,8 @@ jobs:
         run: cd bin && npm install
 
       - name: Execute the script
-        run: |
-          node bin/app.js
-          if [ $NO_UPDATE -eq true ]; then echo "NO_UPDATE=true" >> $GITHUB_ENV; fi
-        
+        run: node bin/app.js
+
       - name: Push artifact to gh-pages
         if: ${{ env.NO_UPDATE == 'true' }}
         uses: crazy-max/ghaction-github-pages@v2.4.1
