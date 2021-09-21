@@ -163,6 +163,7 @@ let rec mainTask (retryCount: int) =
         do! Promise.sleep 1000
         return! mainTask (retryCount + 1)
       else
+        printfn "%s" (e.ToString())
         return -1
     | Ok input ->
       if not input.Ok then
