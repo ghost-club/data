@@ -141,57 +141,73 @@ let checkUpdated (input: IResult<All>) (oldOutput: IResult<All>) =
       else
         output.images |> Array.exists (fun m -> isNullOrUndefined m.srcSet || isNullOrUndefined m.thumbnailUrlWebP)
 
-let mainTask =
+open Fetch.Types
+
+let rec mainTask (retryCount: int) =
   promise {
     if fs.existsSync(!^"./result/") |> not then fs.mkdirSync("./result/")
     printfn "fetching data..."
-    let! input =
-      Fetch.fetch (GoogleAppUrl + "?action=all-force") []
+    let! inputResult =
+      Fetch.tryFetch (GoogleAppUrl + "?action=all-force") [
+        Redirect RedirectMode.Follow
+        Fetch.requestHeaders [
+          UserAgent "GC Website Updater"
+        ]
+      ]
     let! oldOutput =
       Fetch.fetch (BaseUrl + "index.json") []
-    if not input.Ok then
-      printfn "failed to fetch data"
-      return -1
-    else
-      let! input = input.json<IResult<All>>()
-      let! shouldUpdate =
-        promise {
-          if not oldOutput.Ok then return true
-          else
-            let! oldOutput = oldOutput.json<IResult<All>>()
-            return checkUpdated input oldOutput
-        }
-      if not shouldUpdate then
-        printfn "does not need to be updated"
-        ``process``.env?NO_UPDATE <- "true"
-        return 0
+    match inputResult with
+    | Error e ->
+      printfn "failed to fetch data (retry: %d): %s" retryCount e.Message
+      if retryCount < 3 then
+        do! Promise.sleep 1000
+        return! mainTask (retryCount + 1)
       else
-        match input with
-        | IResult.Error msg ->
-          printfn "%s" msg
-          return -1
-        | IResult.Ok all ->
-          printfn "generating gallery..."
-          if fs.existsSync(!^"./result/gallery") |> not then fs.mkdirSync("./result/gallery/")
-          let! _ =
-            Promise.all [
-              for pic in all.images do
-                yield processImageTask pic
-            ]
-
-          printfn "creating index.json..."
-          let all =
-            let images =
-              all.images
-              |> Array.map mapMediaInfo
-            {| all with images = images |}
-          let newJson =
-            JS.JSON.stringify(IResult.Ok all)
-          fs.writeFileSync("./result/index.json", newJson)
+        return -1
+    | Ok input ->
+      if not input.Ok then
+        printfn "failed to fetch data"
+        return -1
+      else
+        let! input = input.json<IResult<All>>()
+        let! shouldUpdate =
+          promise {
+            if not oldOutput.Ok then return true
+            else
+              let! oldOutput = oldOutput.json<IResult<All>>()
+              return checkUpdated input oldOutput
+          }
+        if not shouldUpdate then
+          printfn "does not need to be updated"
+          ``process``.env?NO_UPDATE <- "true"
           return 0
+        else
+          match input with
+          | IResult.Error msg ->
+            printfn "%s" msg
+            return -1
+          | IResult.Ok all ->
+            printfn "generating gallery..."
+            if fs.existsSync(!^"./result/gallery") |> not then fs.mkdirSync("./result/gallery/")
+            let! _ =
+              Promise.all [
+                for pic in all.images do
+                  yield processImageTask pic
+              ]
+
+            printfn "creating index.json..."
+            let all =
+              let images =
+                all.images
+                |> Array.map mapMediaInfo
+              {| all with images = images |}
+            let newJson =
+              JS.JSON.stringify(IResult.Ok all)
+            fs.writeFileSync("./result/index.json", newJson)
+            return 0
   }
 
-mainTask
+mainTask 0
 |> Promise.catch (fun e ->
   eprintf "%s" (e.ToString()); -1)
 |> Promise.iter (fun i -> if i <> 0 then ``process``.exit i)
