@@ -205,6 +205,7 @@ let rec mainTask (retryCount: int) =
             let newJson =
               JS.JSON.stringify(IResult.Ok all)
             fs.writeFileSync("./result/index.json", newJson)
+            ``process``.env?NO_UPDATE <- "false"
             return 0
   }
 
