@@ -37,7 +37,7 @@ jobs:
         run: node bin/app.js
 
       - name: Push artifact to gh-pages
-        if: ${{ env.NO_UPDATE == 'true' }}
+        if: ${{ env.NO_UPDATE != 'true' }}
         uses: crazy-max/ghaction-github-pages@v2.4.1
         with:
           build_dir: result
