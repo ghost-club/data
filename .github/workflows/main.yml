@@ -32,7 +32,7 @@ jobs:
           
       - name: Install dependency of the script
         run: |
-          apt install -y libvips-dev
+          sudo apt-get install -y libvips-dev
           cd bin && npm install
 
       - name: Execute the script
